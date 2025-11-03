@@ -6,3 +6,4 @@ python-dotenv>=1.0
 cryptography>=43.0
 requests>=2.32
 xhtml2pdf>=0.2.15
+gunicorn
