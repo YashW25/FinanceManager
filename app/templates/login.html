@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display:flex;justify-content:center;align-items:flex-start;margin-top:60px;">
+    <div class="card" style="width:100%;max-width:440px;padding:24px">
+        <div style="text-align:center;margin-bottom:12px">
+            <div style="font-size:22px;font-weight:700">Sign in to Income–Expense Manager</div>
+            <div style="color:#666;font-size:13px;margin-top:4px">Enter your company email and password</div>
+        </div>
+        <form method="post" class="form">
+            <label>Email
+                <input name="email" type="email" required placeholder="you@company.com" />
+            </label>
+            <label>Password
+                <input name="password" type="password" required placeholder="••••••••" />
+            </label>
+            <button class="btn" type="submit" style="width:100%">Send OTP</button>
+        </form>
+        <div style="text-align:center;margin-top:10px">
+            <a href="{{ url_for('auth.signup') }}" class="link">Create a company account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

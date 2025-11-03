@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mini Store Management</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="brand">Finance Management</div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/txn/">Manage Transactions</a>
+            <a href="/reports">All Transactions</a>
+            {% if session.get('company_id') %}
+            <a href="/logout">Logout</a>
+            {% else %}
+            <a href="/login">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="flash">
+            {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <div class="sql-panel" id="sql-panel">
+        <div class="sql-header">
+            <strong>Executed SQL (last request)</strong>
+            <div class="grow"></div>
+            <form method="post" action="/sql/clear" style="margin:0">
+                <button class="sql-toggle" type="submit">Clear</button>
+            </form>
+            <button class="sql-toggle" type="button" onclick="toggleSql()">Hide</button>
+        </div>
+        <div class="sql-body single">
+            <pre class="sql-log">{{ sql_recent or 'No SQL recorded yet.' }}</pre>
+        </div>
+    </div>
+
+    <script>
+        const panel = document.getElementById('sql-panel');
+
+        function toggleSql() {
+            panel.classList.toggle('closed');
+            const btn = panel.querySelector('.sql-toggle');
+            btn.textContent = panel.classList.contains('closed') ? 'Show' : 'Hide';
+        }
+    </script>
+
+    {% block footer %}{% endblock %}
+    <footer style="margin-top:24px;padding:12px 0;color:#666;text-align:center;border-top:1px solid #e0e0e0">
+        All rights preserved by InnovaTech Industries 2025
+    </footer>
+</body>
+
+</html>

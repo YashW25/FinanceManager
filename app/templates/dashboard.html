@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="margin-top:20px; align-items: center; display: flex; flex-direction: column; gap: 20px;">
+    <h2>Income–Expense Dashboard</h2>
+    <div class="cards" style="display:flex;gap:12px;flex-wrap:wrap;margin:10px 0; width: 930px;">
+        <div class="card" style="width: 300px; align-items: center; display: flex; flex-direction: column; gap: 12px;">
+            <div class="card-title">Total Income</div>
+            <div class="card-value">{{ '%.2f'|format(total_income) }}</div>
+        </div>
+        <div class="card" style="width: 300px; align-items: center; display: flex; flex-direction: column; gap: 12px;">
+            <div class="card-title">Total Expenses</div>
+            <div class="card-value">{{ '%.2f'|format(total_expense) }}</div>
+        </div>
+        <div class="card" style="width: 300px; align-items: center; display: flex; flex-direction: column; gap: 12px;">
+            <div class="card-title">Net Savings</div>
+            <div class="card-value">{{ '%.2f'|format(net_savings) }}</div>
+        </div>
+    </div>
+
+    <div class="grid" style="display:grid; width: 930px;">
+        <div class="card">
+            <div class="card-title">Recent Transactions</div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in recent %}
+                    <tr>
+                        <td>{{ r.date }}</td>
+                        <td>{{ r.type|capitalize }}</td>
+                        <td>{{ r.category }}</td>
+                        <td>{{ '%.2f'|format(r.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table><br>
+            <a class="btn" style="width: 897px; align-items: center; display: flex; flex-direction: column; gap: 12px;" href="{{ url_for('transactions.list_transactions') }}">Manage Transactions</a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let labels = {
+        {
+            chart_labels | tojson
+        }
+    };
+    let values = {
+        {
+            chart_values | tojson
+        }
+    };
+    if (!Array.isArray(labels)) labels = [];
+    if (!Array.isArray(values)) values = [];
+    if (labels.length === 0 || values.length === 0) {
+        labels = ['No Data'];
+        values = [0];
+    }
+    const c = document.getElementById('chart').getContext('2d');
+    const W = 380,
+        H = 260,
+        pad = 30;
+    c.canvas.width = W;
+    c.canvas.height = H;
+    c.clearRect(0, 0, W, H);
+    const maxV = Math.max(1, ...values.map(v => Math.abs(v)));
+    const barW = (W - 2 * pad) / Math.max(1, values.length);
+    c.strokeStyle = '#bbb';
+    c.beginPath();
+    c.moveTo(pad, H - pad);
+    c.lineTo(W - pad, H - pad);
+    c.stroke();
+    values.forEach((v, i) => {
+        const x = pad + i * barW + 4;
+        const h = (Math.abs(v) / maxV) * (H - 2 * pad);
+        const y = (v >= 0) ? (H - pad - h) : (H - pad);
+        c.fillStyle = v >= 0 ? '#2e7d32' : '#c62828';
+        c.fillRect(x, y, barW - 8, h);
+    });
+    c.fillStyle = '#333';
+    c.font = '10px sans-serif';
+    labels.forEach((lb, i) => c.fillText(lb, pad + i * barW + 4, H - pad + 12));
+
+    // Pie chart for income vs expense
+    const pie = document.getElementById('pie').getContext('2d');
+    const pieW = 300,
+        pieH = 260;
+    pie.canvas.width = pieW;
+    pie.canvas.height = pieH;
+    const centerX = pieW / 2,
+        centerY = pieH / 2,
+        radius = Math.min(pieW, pieH) / 2 - 20;
+    const totalIncome = {
+        {
+            total_income | float | tojson
+        }
+    };
+    const totalExpense = {
+        {
+            total_expense | float | tojson
+        }
+    };
+    const sumIE = Math.max(0.0001, totalIncome + totalExpense);
+    const angles = [(totalIncome / sumIE) * Math.PI * 2, (totalExpense / sumIE) * Math.PI * 2];
+    const colors = ['#2e7d32', '#c62828'];
+    let startA = -Math.PI / 2;
+    angles.forEach((a, idx) => {
+        pie.beginPath();
+        pie.moveTo(centerX, centerY);
+        pie.arc(centerX, centerY, radius, startA, startA + a);
+        pie.closePath();
+        pie.fillStyle = colors[idx];
+        pie.fill();
+        startA += a;
+    });
+    pie.fillStyle = '#333';
+    pie.font = '12px sans-serif';
+    pie.fillText('Income', 10, 20);
+    pie.fillStyle = colors[0];
+    pie.fillRect(60, 10, 12, 12);
+    pie.fillStyle = '#333';
+    pie.fillText('Expense', 10, 40);
+    pie.fillStyle = colors[1];
+    pie.fillRect(60, 30, 12, 12);
+</script>
+{% endblock %}

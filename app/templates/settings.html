@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Settings</h1>
+<div class="card">
+  <form method="post" class="form">
+    <label>Database Type
+      <select name="db_choice">
+        <option value="sqlite" {% if info.dialect == 'sqlite' %}selected{% endif %}>SQLite (local file)</option>
+        <option value="mysql" {% if info.dialect != 'sqlite' %}selected{% endif %}>MySQL (local server)</option>
+      </select>
+    </label>
+    <div id="sqlite-fields">
+      <label>SQLite File Path
+        <input name="sqlite_path" value="{% if info.dialect == 'sqlite' %}{{ info.sqlite_path }}{% endif %}" placeholder="{{ default_sqlite_path }}">
+      </label>
+    </div>
+    <div id="mysql-fields">
+      <label>Host<input name="mysql_host" value="{{ info.host or '127.0.0.1' }}"></label>
+      <label>Port<input name="mysql_port" value="{{ info.port or '3306' }}"></label>
+      <label>User<input name="mysql_user" value="{{ info.username or 'root' }}"></label>
+      <label>Password<input name="mysql_password" type="password"></label>
+      <label>Database<input name="mysql_db" value="{{ info.database or 'ministore' }}"></label>
+    </div>
+    <div style="display:flex; gap:8px">
+      <button class="btn" name="action" value="save">Save to .env</button>
+      <button class="btn secondary" name="action" value="test">Test Connection</button>
+    </div>
+    <div class="hint">After saving, restart the server to apply.</div>
+  </form>
+</div>
+
+<script>
+  const select = document.querySelector('select[name="db_choice"]');
+  const sqliteBox = document.getElementById('sqlite-fields');
+  const mysqlBox = document.getElementById('mysql-fields');
+  function toggle() {
+    const v = select.value;
+    sqliteBox.style.display = v === 'sqlite' ? 'block' : 'none';
+    mysqlBox.style.display = v === 'mysql' ? 'grid' : 'none';
+  }
+  toggle();
+  select.addEventListener('change', toggle);
+</script>
+{% endblock %}
+{% block footer %}{% endblock %}

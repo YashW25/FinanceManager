@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display:flex;justify-content:center;align-items:flex-start;margin-top:60px;">
+    <div class="card" style="width:100%;max-width:420px;padding:24px">
+        <div style="text-align:center;margin-bottom:12px">
+            <div style="font-size:22px;font-weight:700">Verify OTP</div>
+            <div style="color:#666;font-size:13px;margin-top:4px">Enter the 6‑digit code sent to your email</div>
+        </div>
+        <form method="post" class="form">
+      <label>One-time code
+        <input name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123456" />
+            </label>
+            <button class="btn" type="submit" style="width:100%">Verify and Continue</button>
+        </form>
+        <div style="text-align:center;margin-top:10px">
+            <a href="{{ url_for('auth.login') }}" class="link">Back to login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
